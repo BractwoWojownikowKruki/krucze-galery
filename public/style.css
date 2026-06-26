@@ -108,6 +108,7 @@ select:focus { border-color: var(--accent); }
   padding-left: 4px;
 }
 .logo { height: 179px; width: auto; display: block; }
+.logo-mobile { display: none; }
 
 /* ── Grid ── */
 
@@ -236,6 +237,8 @@ main { padding: 1.25rem 1.5rem 3rem; }
   }
 
   .logo { height: 206px; }
+  .logo-desktop { display: none; }
+  .logo-mobile { display: block; }
 
   .search-wrap { flex: 1 1 100%; }
 
