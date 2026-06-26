@@ -35,11 +35,19 @@ export function extractCoverUrl(html: string): string | null {
   return extractMeta(html, 'og:image') ?? extractMeta(html, 'twitter:image') ?? null;
 }
 
-// Accepts YYYY-MM-DD or YYYY.MM.DD at start of title, always returns YYYY-MM-DD.
+// Accepts YYYY-MM-DD / YYYY.MM.DD (returns YYYY-MM-DD) or YYYY-MM / YYYY.MM (returns YYYY-MM).
 export function parseDate(title: string): string | null {
-  const m = title.match(/^(\d{4})[.\-](\d{2})[.\-](\d{2})/);
-  if (!m) return null;
-  return `${m[1]}-${m[2]}-${m[3]}`;
+  const full = title.match(/^(\d{4})[-.](\d{2})[-.](\d{2})/);
+  if (full) return `${full[1]}-${full[2]}-${full[3]}`;
+  const month = title.match(/^(\d{4})[-.](\d{2})(?:[^-.\d]|$)/);
+  if (month) return `${month[1]}-${month[2]}`;
+  return null;
+}
+
+// Strips a leading date prefix (YYYY-MM-DD, YYYY.MM.DD, YYYY-MM, YYYY.MM) from the title.
+export function displayTitle(title: string): string {
+  const stripped = title.replace(/^\d{4}[-.](\d{2})([-.](\d{2}))?\s*/, '').trim();
+  return stripped || title;
 }
 
 export function makeSearchText(title: string): string {

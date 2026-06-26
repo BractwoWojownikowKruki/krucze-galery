@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseDate, extractTitle, makeSearchText } from './utils.ts';
+import { parseDate, extractTitle, makeSearchText, displayTitle } from './utils.ts';
 
 describe('parseDate', () => {
   it('parses YYYY-MM-DD prefix', () => {
@@ -27,8 +27,20 @@ describe('parseDate', () => {
     assert.equal(parseDate(''), null);
   });
 
-  it('does not accept YYYY-MM without day', () => {
-    assert.equal(parseDate('2024-08 Wolin'), null);
+  it('parses YYYY-MM prefix (month only)', () => {
+    assert.equal(parseDate('2010-05 Dziesięciolecie'), '2010-05');
+  });
+
+  it('parses YYYY.MM prefix (month only, dots)', () => {
+    assert.equal(parseDate('2010.05 Dziesięciolecie'), '2010-05');
+  });
+
+  it('parses YYYY-MM with no trailing text', () => {
+    assert.equal(parseDate('2010-05'), '2010-05');
+  });
+
+  it('prefers full date over month-only when both could match', () => {
+    assert.equal(parseDate('2024-08-03 Wolin'), '2024-08-03');
   });
 });
 
@@ -50,6 +62,32 @@ describe('extractTitle', () => {
 
   it('returns null when no title found', () => {
     assert.equal(extractTitle('<html><body></body></html>'), null);
+  });
+});
+
+describe('displayTitle', () => {
+  it('strips YYYY-MM-DD prefix', () => {
+    assert.equal(displayTitle('2024-08-03 Wolin'), 'Wolin');
+  });
+
+  it('strips YYYY.MM.DD prefix', () => {
+    assert.equal(displayTitle('2024.08.03 Wolin'), 'Wolin');
+  });
+
+  it('strips YYYY-MM prefix', () => {
+    assert.equal(displayTitle('2010-05 Dziesięciolecie'), 'Dziesięciolecie');
+  });
+
+  it('strips YYYY.MM prefix', () => {
+    assert.equal(displayTitle('2010.05 Dziesięciolecie'), 'Dziesięciolecie');
+  });
+
+  it('returns original title when no date prefix', () => {
+    assert.equal(displayTitle('Album bez tytułu'), 'Album bez tytułu');
+  });
+
+  it('returns original title when title is only a date (no name)', () => {
+    assert.equal(displayTitle('2024-08-03'), '2024-08-03');
   });
 });
 

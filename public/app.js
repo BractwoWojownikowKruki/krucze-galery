@@ -1,6 +1,6 @@
-const ICON_COPY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+const ICON_LINK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
 </svg>`;
 
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" aria-hidden="true">
@@ -10,15 +10,26 @@ const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke
 let allAlbums = [];
 let sortMode = 'newest';
 
+// Strips YYYY-MM-DD, YYYY.MM.DD, YYYY-MM, or YYYY.MM prefix from a title.
+function displayTitle(title) {
+  const stripped = title.replace(/^\d{4}[-.](\d{2})([-.](\d{2}))?\s*/, '').trim();
+  return stripped || title;
+}
+
+// Normalises date to YYYY-MM-DD for comparison; pads month-only dates with -01.
+function sortKey(date) {
+  if (!date) return null;
+  return date.length === 7 ? date + '-01' : date;
+}
+
 function sort(list) {
   return [...list].sort((a, b) => {
-    if (sortMode === 'alpha') return a.title.localeCompare(b.title, 'pl');
-    if (!a.date && !b.date) return 0;
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    return sortMode === 'newest'
-      ? b.date.localeCompare(a.date)
-      : a.date.localeCompare(b.date);
+    if (sortMode === 'alpha') return displayTitle(a.title).localeCompare(displayTitle(b.title), 'pl');
+    const da = sortKey(a.date), db = sortKey(b.date);
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return sortMode === 'newest' ? db.localeCompare(da) : da.localeCompare(db);
   });
 }
 
@@ -43,29 +54,25 @@ function renderCard(album) {
   return `
     <article class="card" role="listitem">
       <div class="card-cover">
-        <img
-          src="${escapeAttr(album.cover)}"
-          alt="${escapeAttr(album.title)}"
-          loading="lazy"
-          onerror="this.src='covers/placeholder.jpg'"
-        />
+        <a href="${escapeAttr(album.url)}" target="_blank" rel="noopener noreferrer" aria-label="Otwórz album">
+          <img
+            src="${escapeAttr(album.cover)}"
+            alt="${escapeAttr(album.title)}"
+            loading="lazy"
+            onerror="this.src='covers/placeholder.jpg'"
+          />
+        </a>
         ${badge}
       </div>
       <div class="card-body">
-        <p class="card-title">${escapeHtml(album.title)}</p>
-        <div class="card-actions">
-          <a
-            href="${escapeAttr(album.url)}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-open"
-          >Otwórz ↗</a>
+        <div class="title-row">
+          <p class="card-title">${escapeHtml(displayTitle(album.title))}</p>
           <button
-            class="btn btn-copy"
+            class="btn-copy"
             data-url="${escapeAttr(album.url)}"
-            title="Kopiuj URL"
-            aria-label="Kopiuj URL albumu"
-          >${ICON_COPY}</button>
+            title="Kopiuj link"
+            aria-label="Kopiuj link do albumu"
+          >${ICON_LINK}</button>
         </div>
       </div>
     </article>`;
