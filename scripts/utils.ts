@@ -35,20 +35,29 @@ export function extractCoverUrl(html: string): string | null {
   return extractMeta(html, 'og:image') ?? extractMeta(html, 'twitter:image') ?? null;
 }
 
-// Accepts YYYY-MM-DD / YYYY.MM.DD (returns YYYY-MM-DD) or YYYY-MM / YYYY.MM (returns YYYY-MM).
+// Finds a date anywhere in the title. Supports separators - . /
+// Returns YYYY-MM-DD for full dates, YYYY-MM for month-only.
 export function parseDate(title: string): string | null {
-  const full = title.match(/^(\d{4})[-.](\d{2})[-.](\d{2})/);
+  // Full date: YYYY[-./]MM[-./]DD anywhere in title
+  const full = title.match(/(\d{4})[-./](\d{2})[-./](\d{2})/);
   if (full) return `${full[1]}-${full[2]}-${full[3]}`;
-  const month = title.match(/^(\d{4})[-.](\d{2})(?:[^-.\d]|$)/);
+  // Month-only: YYYY[-./]MM anywhere, not followed by another separator+digit
+  const month = title.match(/(\d{4})[-./](\d{2})(?=[^-./\d]|$)/);
   if (month) return `${month[1]}-${month[2]}`;
   return null;
 }
 
-// Strips a leading date prefix from the title, including optional end-day for ranges
-// e.g. YYYY-MM-DD-DD (2021-01-23-25) or YYYY-MM-DD, YYYY.MM.DD, YYYY-MM, YYYY.MM.
+// Strips a date from anywhere in the title (prefix, suffix, or inline).
+// Handles YYYY-MM-DD-DD ranges and separators - . /
 export function displayTitle(title: string): string {
-  const stripped = title.replace(/^\d{4}[-.]\d{2}(?:[-.]\d{2}(?:-\d{2})?)?\s*/, '').trim();
-  return stripped || title;
+  const clean = (s: string) => s.replace(/^[\s,\-–—]+|[\s,\-–—]+$/g, '').trim();
+  // Full date with optional range end-day
+  let s = title.replace(/\d{4}[-./]\d{2}[-./]\d{2}(?:-\d{2})?/, '');
+  if (s !== title) return clean(s) || title;
+  // Month-only
+  s = title.replace(/\d{4}[-./]\d{2}(?=[^-./\d]|$)/, '');
+  if (s !== title) return clean(s) || title;
+  return title;
 }
 
 export function makeSearchText(title: string): string {

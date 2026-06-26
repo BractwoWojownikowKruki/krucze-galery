@@ -3,52 +3,69 @@ import assert from 'node:assert/strict';
 import { parseDate, extractTitle, makeSearchText, displayTitle, parseAlbumsTxt } from './utils.ts';
 
 describe('parseDate', () => {
+  // --- prefix, hyphens ---
   it('parses YYYY-MM-DD prefix', () => {
     assert.equal(parseDate('2024-08-03 Wolin'), '2024-08-03');
   });
-
-  it('parses YYYY.MM.DD prefix and normalises to hyphens', () => {
-    assert.equal(parseDate('2024.08.03 Wolin'), '2024-08-03');
-  });
-
-  it('parses YYYY.MM.DD with no trailing text', () => {
-    assert.equal(parseDate('2014.06.21 Poznań Kupała'), '2014-06-21');
-  });
-
-  it('returns null when date is at end of title, not prefix', () => {
-    assert.equal(parseDate('Wolin 2024'), null);
-  });
-
-  it('returns null for title with no date at all', () => {
-    assert.equal(parseDate('Album bez tytułu'), null);
-  });
-
-  it('returns null for empty string', () => {
-    assert.equal(parseDate(''), null);
-  });
-
   it('parses YYYY-MM prefix (month only)', () => {
     assert.equal(parseDate('2010-05 Dziesięciolecie'), '2010-05');
   });
-
-  it('parses YYYY.MM prefix (month only, dots)', () => {
-    assert.equal(parseDate('2010.05 Dziesięciolecie'), '2010-05');
-  });
-
   it('parses YYYY-MM with no trailing text', () => {
     assert.equal(parseDate('2010-05'), '2010-05');
   });
 
+  // --- prefix, dots ---
+  it('parses YYYY.MM.DD prefix', () => {
+    assert.equal(parseDate('2024.08.03 Wolin'), '2024-08-03');
+  });
+  it('parses YYYY.MM.DD with Polish name', () => {
+    assert.equal(parseDate('2014.06.21 Poznań Kupała'), '2014-06-21');
+  });
+  it('parses YYYY.MM prefix (month only, dots)', () => {
+    assert.equal(parseDate('2010.05 Dziesięciolecie'), '2010-05');
+  });
+
+  // --- prefix, slashes ---
+  it('parses YYYY/MM/DD prefix', () => {
+    assert.equal(parseDate('2024/08/03 Wolin'), '2024-08-03');
+  });
+  it('parses YYYY/MM prefix (month only, slashes)', () => {
+    assert.equal(parseDate('2025/05 Radzim'), '2025-05');
+  });
+
+  // --- date at end (the Radzim 2025.05 case) ---
+  it('parses YYYY.MM at end of title', () => {
+    assert.equal(parseDate('Radzim 2025.05'), '2025-05');
+  });
+  it('parses YYYY-MM-DD at end of title', () => {
+    assert.equal(parseDate('Radzim 2025-05-23'), '2025-05-23');
+  });
+  it('parses YYYY-MM in middle of title', () => {
+    assert.equal(parseDate('Wolin 2024-08 letni obóz'), '2024-08');
+  });
+
+  // --- day ranges YYYY-MM-DD-DD ---
+  it('parses start date from a day-range prefix YYYY-MM-DD-DD', () => {
+    assert.equal(parseDate('2021-01-23-25 Wolin'), '2021-01-23');
+  });
+  it('parses start date from a day-range with no trailing text', () => {
+    assert.equal(parseDate('2021-01-23-25'), '2021-01-23');
+  });
+
+  // --- full date preferred over month-only ---
   it('prefers full date over month-only when both could match', () => {
     assert.equal(parseDate('2024-08-03 Wolin'), '2024-08-03');
   });
 
-  it('parses start date from a day-range prefix YYYY-MM-DD-DD', () => {
-    assert.equal(parseDate('2021-01-23-25 Wolin'), '2021-01-23');
+  // --- no date ---
+  it('returns null for year only', () => {
+    assert.equal(parseDate('Wolin 2024'), null);
   });
-
-  it('parses start date from a day-range with no trailing text', () => {
-    assert.equal(parseDate('2021-01-23-25'), '2021-01-23');
+  it('returns null for title with no date at all', () => {
+    assert.equal(parseDate('Album bez tytułu'), null);
+  });
+  it('returns null for empty string', () => {
+    assert.equal(parseDate(''), null);
   });
 });
 
@@ -74,36 +91,47 @@ describe('extractTitle', () => {
 });
 
 describe('displayTitle', () => {
+  // --- date at prefix ---
   it('strips YYYY-MM-DD prefix', () => {
     assert.equal(displayTitle('2024-08-03 Wolin'), 'Wolin');
   });
-
   it('strips YYYY.MM.DD prefix', () => {
     assert.equal(displayTitle('2024.08.03 Wolin'), 'Wolin');
   });
-
+  it('strips YYYY/MM/DD prefix', () => {
+    assert.equal(displayTitle('2024/08/03 Wolin'), 'Wolin');
+  });
   it('strips YYYY-MM prefix', () => {
     assert.equal(displayTitle('2010-05 Dziesięciolecie'), 'Dziesięciolecie');
   });
-
   it('strips YYYY.MM prefix', () => {
     assert.equal(displayTitle('2010.05 Dziesięciolecie'), 'Dziesięciolecie');
   });
 
-  it('returns original title when no date prefix', () => {
-    assert.equal(displayTitle('Album bez tytułu'), 'Album bez tytułu');
+  // --- date at suffix (the Radzim 2025.05 case) ---
+  it('strips YYYY.MM suffix', () => {
+    assert.equal(displayTitle('Radzim 2025.05'), 'Radzim');
+  });
+  it('strips YYYY-MM-DD suffix', () => {
+    assert.equal(displayTitle('Radzim 2025-05-23'), 'Radzim');
   });
 
-  it('returns original title when title is only a date (no name)', () => {
-    assert.equal(displayTitle('2024-08-03'), '2024-08-03');
-  });
-
+  // --- day range ---
   it('strips YYYY-MM-DD-DD range prefix leaving only the name', () => {
     assert.equal(displayTitle('2021-01-23-25 Wolin'), 'Wolin');
   });
 
-  it('strips YYYY-MM-DD-DD with no trailing name, returns original', () => {
+  // --- no name left → return original ---
+  it('returns original when title is only a date', () => {
+    assert.equal(displayTitle('2024-08-03'), '2024-08-03');
+  });
+  it('returns original when title is only a range date', () => {
     assert.equal(displayTitle('2021-01-23-25'), '2021-01-23-25');
+  });
+
+  // --- no date ---
+  it('returns original title when no date', () => {
+    assert.equal(displayTitle('Album bez tytułu'), 'Album bez tytułu');
   });
 });
 
