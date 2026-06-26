@@ -107,7 +107,7 @@ select:focus { border-color: var(--accent); }
   justify-content: flex-start;
   padding-left: 4px;
 }
-.logo { height: 179px; width: auto; display: block; transform: scaleY(-1); }
+.logo { height: 179px; width: auto; display: block; }
 
 /* ── Grid ── */
 
