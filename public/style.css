@@ -207,6 +207,32 @@ main { padding: 1.25rem 1.5rem 3rem; }
 .btn-copy:hover { color: var(--gold); }
 .btn-copy svg { width: 13px; height: 13px; pointer-events: none; }
 
+/* ── Footer ── */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.footer a {
+  color: var(--text-faint);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s;
+}
+
+.footer a:hover { color: var(--gold); }
+
+.footer svg { width: 16px; height: 16px; }
+
 /* ── Empty state ── */
 
 .empty {
