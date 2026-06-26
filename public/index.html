@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Krucze Galery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="search" id="search" placeholder="Szukaj albumów…" autocomplete="off" />
+    </div>
+    <select id="sort" aria-label="Sortowanie">
+      <option value="newest">Najnowsze</option>
+      <option value="oldest">Najstarsze</option>
+      <option value="alpha">A → Z</option>
+    </select>
+    <div class="count" id="count" aria-live="polite"></div>
+    <!-- Place your logo as public/logo.png -->
+    <a href="/" class="logo-link" aria-label="Krucze Galery — strona główna">
+      <img src="logo.png" alt="Krucze Galery" class="logo" onerror="this.style.display='none'" />
+    </a>
+  </header>
+
+  <main>
+    <div class="grid" id="grid" role="list"></div>
+    <p class="empty" id="empty" hidden>Nie znaleziono albumów. Spróbuj innego wyszukiwania.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
