@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import https from 'https';
 import { join } from 'path';
-import { extractCoverUrl, extractTitle, makeSearchText, parseDate } from './utils.ts';
+import { AlbumEntry, extractCoverUrl, extractTitle, makeSearchText, parseAlbumsTxt, parseDate } from './utils.ts';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const ALBUMS_TXT = join(ROOT, 'albums.txt');
@@ -17,22 +17,6 @@ interface AlbumRecord {
   searchText: string;
   lastSyncedAt: string;
   syncStatus: 'ok' | 'failed';
-}
-
-function parseAlbumsTxt(content: string): string[] {
-  const seen = new Set<string>();
-  const urls: string[] = [];
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    if (seen.has(trimmed)) {
-      console.warn(`[warn] Duplikat pominięty: ${trimmed}`);
-      continue;
-    }
-    seen.add(trimmed);
-    urls.push(trimmed);
-  }
-  return urls;
 }
 
 function coverHash(url: string): string {
@@ -74,7 +58,7 @@ async function downloadCover(coverUrl: string, destPath: string): Promise<void> 
   writeFileSync(destPath, Buffer.from(buf));
 }
 
-async function syncAlbum(url: string, cached: AlbumRecord | undefined): Promise<AlbumRecord> {
+async function syncAlbum({ url, nameOverride }: AlbumEntry, cached: AlbumRecord | undefined): Promise<AlbumRecord> {
   const hash = coverHash(url);
   const coverFile = `${hash}.jpg`;
   const coverPath = join(COVERS_DIR, coverFile);
@@ -85,7 +69,7 @@ async function syncAlbum(url: string, cached: AlbumRecord | undefined): Promise<
     console.log(`[sync] ${url}`);
     const html = await fetchHtml(url);
 
-    const title = extractTitle(html) ?? cached?.title ?? 'Album bez tytułu';
+    const title = nameOverride ?? extractTitle(html) ?? cached?.title ?? 'Album bez tytułu';
     const coverUrl = extractCoverUrl(html);
 
     if (coverUrl) {
@@ -126,8 +110,8 @@ async function syncAlbum(url: string, cached: AlbumRecord | undefined): Promise<
 async function main(): Promise<void> {
   mkdirSync(COVERS_DIR, { recursive: true });
 
-  const urls = parseAlbumsTxt(readFileSync(ALBUMS_TXT, 'utf8'));
-  console.log(`[sync] Znaleziono ${urls.length} album(ów) w albums.txt`);
+  const entries = parseAlbumsTxt(readFileSync(ALBUMS_TXT, 'utf8'));
+  console.log(`[sync] Znaleziono ${entries.length} album(ów) w albums.txt`);
 
   const existing: AlbumRecord[] = existsSync(GENERATED_JSON)
     ? JSON.parse(readFileSync(GENERATED_JSON, 'utf8'))
@@ -136,8 +120,8 @@ async function main(): Promise<void> {
   const cache = new Map(existing.map(a => [a.url, a]));
 
   const results: AlbumRecord[] = [];
-  for (const url of urls) {
-    results.push(await syncAlbum(url, cache.get(url)));
+  for (const entry of entries) {
+    results.push(await syncAlbum(entry, cache.get(entry.url)));
   }
 
   writeFileSync(GENERATED_JSON, JSON.stringify(results, null, 2) + '\n');

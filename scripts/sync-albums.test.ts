@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseDate, extractTitle, makeSearchText, displayTitle } from './utils.ts';
+import { parseDate, extractTitle, makeSearchText, displayTitle, parseAlbumsTxt } from './utils.ts';
 
 describe('parseDate', () => {
   it('parses YYYY-MM-DD prefix', () => {
@@ -88,6 +88,38 @@ describe('displayTitle', () => {
 
   it('returns original title when title is only a date (no name)', () => {
     assert.equal(displayTitle('2024-08-03'), '2024-08-03');
+  });
+});
+
+describe('parseAlbumsTxt', () => {
+  it('parses a plain URL line', () => {
+    const result = parseAlbumsTxt('https://photos.app.goo.gl/abc');
+    assert.deepEqual(result, [{ url: 'https://photos.app.goo.gl/abc', nameOverride: undefined }]);
+  });
+
+  it('parses a URL with name override', () => {
+    const result = parseAlbumsTxt('https://photos.app.goo.gl/abc | 2024-08-03 Wolin');
+    assert.deepEqual(result, [{ url: 'https://photos.app.goo.gl/abc', nameOverride: '2024-08-03 Wolin' }]);
+  });
+
+  it('skips comment lines', () => {
+    const result = parseAlbumsTxt('# comment\nhttps://photos.app.goo.gl/abc');
+    assert.equal(result.length, 1);
+  });
+
+  it('skips blank lines', () => {
+    const result = parseAlbumsTxt('\nhttps://photos.app.goo.gl/abc\n\n');
+    assert.equal(result.length, 1);
+  });
+
+  it('deduplicates URLs', () => {
+    const result = parseAlbumsTxt('https://photos.app.goo.gl/abc\nhttps://photos.app.goo.gl/abc');
+    assert.equal(result.length, 1);
+  });
+
+  it('trims whitespace around url and name', () => {
+    const result = parseAlbumsTxt('  https://photos.app.goo.gl/abc  |  2024-08-03 Wolin  ');
+    assert.deepEqual(result, [{ url: 'https://photos.app.goo.gl/abc', nameOverride: '2024-08-03 Wolin' }]);
   });
 });
 

@@ -53,3 +53,26 @@ export function displayTitle(title: string): string {
 export function makeSearchText(title: string): string {
   return title.toLowerCase().replace(/[–—]/g, '-');
 }
+
+export interface AlbumEntry {
+  url: string;
+  nameOverride?: string;
+}
+
+export function parseAlbumsTxt(content: string): AlbumEntry[] {
+  const seen = new Set<string>();
+  const entries: AlbumEntry[] = [];
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const [rawUrl, rawName] = trimmed.split('|').map(s => s.trim());
+    if (!rawUrl) continue;
+    if (seen.has(rawUrl)) {
+      console.warn(`[warn] Duplikat pominięty: ${rawUrl}`);
+      continue;
+    }
+    seen.add(rawUrl);
+    entries.push({ url: rawUrl, nameOverride: rawName || undefined });
+  }
+  return entries;
+}
