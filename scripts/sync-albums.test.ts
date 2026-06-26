@@ -1,0 +1,68 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { parseDate, extractTitle, makeSearchText } from './utils.ts';
+
+describe('parseDate', () => {
+  it('parses YYYY-MM-DD prefix', () => {
+    assert.equal(parseDate('2024-08-03 Wolin'), '2024-08-03');
+  });
+
+  it('parses YYYY.MM.DD prefix and normalises to hyphens', () => {
+    assert.equal(parseDate('2024.08.03 Wolin'), '2024-08-03');
+  });
+
+  it('parses YYYY.MM.DD with no trailing text', () => {
+    assert.equal(parseDate('2014.06.21 Poznań Kupała'), '2014-06-21');
+  });
+
+  it('returns null when date is at end of title, not prefix', () => {
+    assert.equal(parseDate('Wolin 2024'), null);
+  });
+
+  it('returns null for title with no date at all', () => {
+    assert.equal(parseDate('Album bez tytułu'), null);
+  });
+
+  it('returns null for empty string', () => {
+    assert.equal(parseDate(''), null);
+  });
+
+  it('does not accept YYYY-MM without day', () => {
+    assert.equal(parseDate('2024-08 Wolin'), null);
+  });
+});
+
+describe('extractTitle', () => {
+  it('strips og:title date+emoji suffix', () => {
+    const html = '<meta property="og:title" content="2024-08-03 Wolin · Saturday, Aug 3, 2024 📸">';
+    assert.equal(extractTitle(html), '2024-08-03 Wolin');
+  });
+
+  it('strips "- Google Photos" from page title', () => {
+    const html = '<title>2024-08-03 Wolin - Google Photos</title>';
+    assert.equal(extractTitle(html), '2024-08-03 Wolin');
+  });
+
+  it('prefers og:title over page title', () => {
+    const html = '<meta property="og:title" content="OG Title · suffix"><title>Page Title - Google Photos</title>';
+    assert.equal(extractTitle(html), 'OG Title');
+  });
+
+  it('returns null when no title found', () => {
+    assert.equal(extractTitle('<html><body></body></html>'), null);
+  });
+});
+
+describe('makeSearchText', () => {
+  it('lowercases the title', () => {
+    assert.equal(makeSearchText('Wolin Walki'), 'wolin walki');
+  });
+
+  it('replaces en-dash with hyphen', () => {
+    assert.equal(makeSearchText('Wolin – Walki'), 'wolin - walki');
+  });
+
+  it('replaces em-dash with hyphen', () => {
+    assert.equal(makeSearchText('Wolin — Walki'), 'wolin - walki');
+  });
+});

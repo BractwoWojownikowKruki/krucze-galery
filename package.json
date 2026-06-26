@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "sync-albums": "tsx scripts/sync-albums.ts",
+    "test": "node --import=tsx/esm --test scripts/sync-albums.test.ts",
     "build": "mkdir -p dist && cp -r public/* dist/",
     "dev": "npx serve public"
   },

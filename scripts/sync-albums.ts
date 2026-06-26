@@ -2,6 +2,7 @@ import { createHash } from 'crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import https from 'https';
 import { join } from 'path';
+import { extractCoverUrl, extractTitle, makeSearchText, parseDate } from './utils.ts';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const ALBUMS_TXT = join(ROOT, 'albums.txt');
@@ -36,53 +37,6 @@ function parseAlbumsTxt(content: string): string[] {
 
 function coverHash(url: string): string {
   return createHash('sha256').update(url).digest('hex').slice(0, 8);
-}
-
-function extractMeta(html: string, property: string): string | null {
-  const patterns = [
-    new RegExp(`<meta[^>]+property=["']${property}["'][^>]+content=["']([^"']+)["']`, 'i'),
-    new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${property}["']`, 'i'),
-    new RegExp(`<meta[^>]+name=["']${property}["'][^>]+content=["']([^"']+)["']`, 'i'),
-    new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+name=["']${property}["']`, 'i'),
-  ];
-  for (const re of patterns) {
-    const m = html.match(re);
-    if (m?.[1]) return decodeHtmlEntities(m[1].trim());
-  }
-  return null;
-}
-
-function extractTitle(html: string): string | null {
-  // og:title contains "Album name · date 📸" — strip the suffix
-  const ogTitle = extractMeta(html, 'og:title');
-  if (ogTitle) return ogTitle.replace(/\s*·.*$/, '').trim();
-
-  // <title> contains "Album name - Google Photos" — strip the suffix
-  const pageTitle = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim();
-  if (pageTitle) return pageTitle.replace(/\s*-\s*Google Photos$/i, '').trim();
-
-  return null;
-}
-
-function extractCoverUrl(html: string): string | null {
-  return extractMeta(html, 'og:image') ?? extractMeta(html, 'twitter:image') ?? null;
-}
-
-function decodeHtmlEntities(str: string): string {
-  return str
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-}
-
-function parseDate(title: string): string | null {
-  return title.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] ?? null;
-}
-
-function makeSearchText(title: string): string {
-  return title.toLowerCase().replace(/[–—]/g, '-');
 }
 
 // Google Photos short URLs (photos.app.goo.gl) return 302 only to minimal UAs.
@@ -124,7 +78,7 @@ async function syncAlbum(url: string, cached: AlbumRecord | undefined): Promise<
   const hash = coverHash(url);
   const coverFile = `${hash}.jpg`;
   const coverPath = join(COVERS_DIR, coverFile);
-  const coverPublic = `/covers/${coverFile}`;
+  const coverPublic = `covers/${coverFile}`;
   const now = new Date().toISOString();
 
   try {
@@ -144,7 +98,7 @@ async function syncAlbum(url: string, cached: AlbumRecord | undefined): Promise<
 
     const cover = existsSync(coverPath)
       ? coverPublic
-      : (cached?.cover ?? '/covers/placeholder.jpg');
+      : (cached?.cover ?? 'covers/placeholder.jpg');
 
     return {
       url,
@@ -161,7 +115,7 @@ async function syncAlbum(url: string, cached: AlbumRecord | undefined): Promise<
       url,
       title: cached?.title ?? 'Album bez tytułu',
       date: cached?.date ?? null,
-      cover: cached?.cover ?? '/covers/placeholder.jpg',
+      cover: cached?.cover ?? 'covers/placeholder.jpg',
       searchText: cached?.searchText ?? '',
       lastSyncedAt: now,
       syncStatus: 'failed',

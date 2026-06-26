@@ -47,7 +47,7 @@ function renderCard(album) {
           src="${escapeAttr(album.cover)}"
           alt="${escapeAttr(album.title)}"
           loading="lazy"
-          onerror="this.src='/covers/placeholder.jpg'"
+          onerror="this.src='covers/placeholder.jpg'"
         />
         ${badge}
       </div>
