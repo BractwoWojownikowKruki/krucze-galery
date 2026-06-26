@@ -261,7 +261,8 @@ main { padding: 1.25rem 1.5rem 3rem; }
     padding-left: 0;
   }
 
-  .logo { height: 206px; }
+  .logo-link picture { width: 100%; }
+  .logo { width: 100%; height: auto; }
 
   .search-wrap { flex: 1 1 100%; }
 
