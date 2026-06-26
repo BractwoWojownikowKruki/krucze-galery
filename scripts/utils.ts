@@ -49,8 +49,10 @@ export function parseDate(title: string): string | null {
 
 // Strips a date from anywhere in the title (prefix, suffix, or inline).
 // Handles YYYY-MM-DD-DD ranges and separators - . /
+// After stripping, trims leading non-letter characters (orphan fragments like "-04").
 export function displayTitle(title: string): string {
-  const clean = (s: string) => s.replace(/^[\s,\-–—]+|[\s,\-–—]+$/g, '').trim();
+  const clean = (s: string) =>
+    s.replace(/^[^\p{L}]+/u, '').replace(/[\s,\-–—]+$/g, '').trim();
   // Full date with optional range end-day
   let s = title.replace(/\d{4}[-./]\d{2}[-./]\d{2}(?:-\d{2})?/, '');
   if (s !== title) return clean(s) || title;

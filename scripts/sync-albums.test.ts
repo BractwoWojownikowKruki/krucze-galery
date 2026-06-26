@@ -121,6 +121,14 @@ describe('displayTitle', () => {
     assert.equal(displayTitle('2021-01-23-25 Wolin'), 'Wolin');
   });
 
+  it('strips YYYY.MM.DD-DD mixed-separator range (the 2019.08.02-04 Wolin case)', () => {
+    assert.equal(displayTitle('2019.08.02-04 Wolin'), 'Wolin');
+  });
+
+  it('strips leading non-letter orphan fragments after date removal', () => {
+    assert.equal(displayTitle('2019.08.02-04'), '2019.08.02-04'); // no name → return original
+  });
+
   // --- no name left → return original ---
   it('returns original when title is only a date', () => {
     assert.equal(displayTitle('2024-08-03'), '2024-08-03');

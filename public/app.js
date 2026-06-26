@@ -10,10 +10,13 @@ const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke
 let allAlbums = [];
 let sortMode = 'newest';
 
-// Strips YYYY-MM-DD, YYYY.MM.DD, YYYY-MM, or YYYY.MM prefix from a title.
 function displayTitle(title) {
-  const stripped = title.replace(/^\d{4}[-.](\d{2})([-.](\d{2}))?\s*/, '').trim();
-  return stripped || title;
+  const clean = s => s.replace(/^[^\p{L}]+/u, '').replace(/[\s,\-–—]+$/g, '').trim();
+  let s = title.replace(/\d{4}[-./]\d{2}[-./]\d{2}(?:-\d{2})?/, '');
+  if (s !== title) return clean(s) || title;
+  s = title.replace(/\d{4}[-./]\d{2}(?=[^-./\d]|$)/, '');
+  if (s !== title) return clean(s) || title;
+  return title;
 }
 
 // Normalises date to YYYY-MM-DD for comparison; pads month-only dates with -01.

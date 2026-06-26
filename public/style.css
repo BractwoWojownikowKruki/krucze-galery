@@ -106,7 +106,7 @@ select:focus { border-color: var(--accent); }
   align-items: center;
   padding-left: 8px;
 }
-.logo { height: 120px; width: auto; display: block; }
+.logo { height: 132px; width: auto; display: block; }
 
 /* ── Grid ── */
 
@@ -234,7 +234,7 @@ main { padding: 1.25rem 1.5rem 3rem; }
     padding-left: 0;
   }
 
-  .logo { height: 148px; }
+  .logo { height: 163px; }
 
   .search-wrap { flex: 1 1 100%; }
 
