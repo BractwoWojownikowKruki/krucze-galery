@@ -11,28 +11,29 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="toolbar">
-    <div class="search-wrap">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
-      <input type="search" id="search" placeholder="Szukaj albumów…" autocomplete="off" />
-    </div>
-    <div class="toolbar-controls">
-      <select id="sort" aria-label="Sortowanie">
-        <option value="newest">Najnowsze</option>
-        <option value="oldest">Najstarsze</option>
-        <option value="alpha">A → Z</option>
-      </select>
-      <div class="count" id="count" aria-live="polite"></div>
-    </div>
-    <!-- Place your logo as public/logo.png -->
+  <header class="site-header">
     <a href="https://www.kruki.org" class="logo-link" aria-label="Krucze Galery — strona główna">
       <picture>
         <source media="(max-width: 600px)" srcset="logo.png" />
         <img src="logo-desktop.png" alt="Krucze Galery" class="logo" onerror="this.style.display='none'" />
       </picture>
     </a>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="search" id="search" placeholder="Szukaj albumów…" autocomplete="off" />
+      </div>
+      <div class="toolbar-controls">
+        <select id="sort" aria-label="Sortowanie">
+          <option value="newest">Najnowsze</option>
+          <option value="oldest">Najstarsze</option>
+          <option value="alpha">A → Z</option>
+        </select>
+        <div class="count" id="count" aria-live="polite"></div>
+      </div>
+    </div>
   </header>
 
   <main>
