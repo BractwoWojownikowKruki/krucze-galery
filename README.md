@@ -7,9 +7,9 @@ Strona dostępna pod adresem: **https://bractwowojownikowkruki.github.io/krucze-
 
 ## Jak dodać album
 
-Nie trzeba instalować niczego ani klonować repozytorium. Wystarczy konto na GitHubie z dostępem do tego repo.
+Nie trzeba instalować niczego. Potrzebne jest tylko **konto na GitHubie** (rejestracja bezpłatna na https://github.com).
 
-### Krok 1 — Otwórz plik `albums.txt` w przeglądarce
+### Krok 1 — Otwórz plik `albums.txt`
 
 Przejdź do:  
 **https://github.com/BractwoWojownikowKruki/krucze-galery/blob/main/albums.txt**
@@ -17,6 +17,8 @@ Przejdź do:
 ### Krok 2 — Kliknij ikonę ołówka ✏️
 
 W prawym górnym rogu widoku pliku kliknij ikonę ołówka („Edit this file").
+
+GitHub wyświetli komunikat: *„You're editing a file in a project you don't have write access to"* — to normalne. GitHub automatycznie utworzy kopię repozytorium na Twoim koncie (tzw. fork).
 
 ### Krok 3 — Dodaj URL albumu
 
@@ -40,16 +42,11 @@ Przydatne gdy:
 - tytuł albumu w Google Photos jest nieczytelny lub pusty
 - album obejmuje kilka dni: `2024-08-03-05 Wolin` (sortuje po 3 sie, wyświetla „Wolin")
 
-### Krok 4 — Zapisz zmiany
+### Krok 4 — Wyślij propozycję zmiany
 
-Przewiń na dół, w polu „Commit changes" wpisz krótki opis (np. `dodaj album Wolin 2024`) i kliknij **Commit changes**.
+Kliknij zielony przycisk **„Propose changes"**, a następnie **„Create pull request"**.
 
-### Krok 5 — Poczekaj chwilę
-
-GitHub automatycznie uruchomi synchronizację (ok. 1–2 minuty). Po jej zakończeniu album pojawi się na stronie galerii.
-
-Postęp synchronizacji można śledzić w zakładce **Actions**:  
-https://github.com/BractwoWojownikowKruki/krucze-galery/actions
+Właściciel galerii otrzyma powiadomienie, przejrzy zmianę i zatwierdzi ją. Po zatwierdzeniu album pojawi się na stronie automatycznie (synchronizacja trwa ok. 1–2 minut).
 
 ---
 
