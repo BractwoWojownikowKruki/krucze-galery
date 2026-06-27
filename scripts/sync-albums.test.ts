@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseDate, extractTitle, makeSearchText, displayTitle, parseAlbumsTxt } from './utils.ts';
+import { parseDate, extractTitle, makeSearchText, displayTitle, parseAlbumsTxt, extractPhotoCount } from './utils.ts';
 
 describe('parseDate', () => {
   // --- prefix, hyphens ---
@@ -172,6 +172,29 @@ describe('parseAlbumsTxt', () => {
   it('trims whitespace around url and name', () => {
     const result = parseAlbumsTxt('  https://photos.app.goo.gl/abc  |  2024-08-03 Wolin  ');
     assert.deepEqual(result, [{ url: 'https://photos.app.goo.gl/abc', nameOverride: '2024-08-03 Wolin' }]);
+  });
+});
+
+describe('extractPhotoCount', () => {
+  it('counts unique photo IDs with lh3 URLs', () => {
+    const html = [
+      '["AF1Qip111",["https://lh3.googleusercontent.com/a",1024,680]]',
+      '["AF1Qip222",["https://lh3.googleusercontent.com/b",1024,680]]',
+      '["AF1Qip333",["https://lh3.googleusercontent.com/c",1024,680]]',
+    ].join('\n');
+    assert.equal(extractPhotoCount(html), 3);
+  });
+
+  it('deduplicates the same photo ID appearing twice', () => {
+    const html = [
+      '["AF1Qip111",["https://lh3.googleusercontent.com/a",1024,680]]',
+      '["AF1Qip111",["https://lh3.googleusercontent.com/a",1024,680]]',
+    ].join('\n');
+    assert.equal(extractPhotoCount(html), 1);
+  });
+
+  it('returns null when no photo IDs are present', () => {
+    assert.equal(extractPhotoCount('<html><head></head><body></body></html>'), null);
   });
 });
 

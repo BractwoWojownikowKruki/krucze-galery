@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import https from 'https';
 import { join } from 'path';
-import { AlbumEntry, extractCoverUrl, extractTitle, makeSearchText, parseAlbumsTxt, parseDate } from './utils.ts';
+import { AlbumEntry, extractCoverUrl, extractPhotoCount, extractTitle, makeSearchText, parseAlbumsTxt, parseDate } from './utils.ts';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const ALBUMS_TXT = join(ROOT, 'albums.txt');
@@ -14,6 +14,7 @@ interface AlbumRecord {
   title: string;
   date: string | null;
   cover: string;
+  photoCount: number | null;
   searchText: string;
   lastSyncedAt: string;
   syncStatus: 'ok' | 'failed';
@@ -71,6 +72,7 @@ async function syncAlbum({ url, nameOverride }: AlbumEntry, cached: AlbumRecord 
 
     const title = nameOverride ?? extractTitle(html) ?? cached?.title ?? 'Album bez tytułu';
     const coverUrl = extractCoverUrl(html);
+    const photoCount = extractPhotoCount(html);
 
     if (coverUrl) {
       try {
@@ -89,6 +91,7 @@ async function syncAlbum({ url, nameOverride }: AlbumEntry, cached: AlbumRecord 
       title,
       date: parseDate(title),
       cover,
+      photoCount: photoCount ?? cached?.photoCount ?? null,
       searchText: makeSearchText(title),
       lastSyncedAt: now,
       syncStatus: 'ok',
@@ -100,6 +103,7 @@ async function syncAlbum({ url, nameOverride }: AlbumEntry, cached: AlbumRecord 
       title: cached?.title ?? 'Album bez tytułu',
       date: cached?.date ?? null,
       cover: cached?.cover ?? 'covers/placeholder.jpg',
+      photoCount: cached?.photoCount ?? null,
       searchText: cached?.searchText ?? '',
       lastSyncedAt: now,
       syncStatus: 'failed',

@@ -49,10 +49,30 @@ function escapeAttr(str) {
   return str.replace(/"/g, '&quot;');
 }
 
+let toastTimer = null;
+function showToast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 3500);
+}
+
 function renderCard(album) {
   const badge = album.date
     ? `<span class="date-badge">${album.date}</span>`
     : `<span class="no-date-badge">bez daty</span>`;
+
+  const countBadge = album.photoCount != null
+    ? `<button class="btn-count" aria-label="Informacja o liczbie zdjęć">~${album.photoCount}</button>`
+    : '';
 
   return `
     <article class="card" role="listitem">
@@ -70,6 +90,7 @@ function renderCard(album) {
       <div class="card-body">
         <div class="title-row">
           <p class="card-title">${escapeHtml(displayTitle(album.title))}</p>
+          ${countBadge}
           <button
             class="btn-copy"
             data-url="${escapeAttr(album.url)}"
@@ -103,6 +124,10 @@ function update() {
 }
 
 document.getElementById('grid').addEventListener('click', e => {
+  if (e.target.closest('.btn-count')) {
+    showToast('Liczba zdjęć orientacyjna, z chwili importu ostatniego albumu');
+    return;
+  }
   const btn = e.target.closest('.btn-copy');
   if (!btn) return;
   navigator.clipboard.writeText(btn.dataset.url).catch(() => {});

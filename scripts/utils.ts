@@ -62,6 +62,12 @@ export function displayTitle(title: string): string {
   return title;
 }
 
+export function extractPhotoCount(html: string): number | null {
+  const matches = [...html.matchAll(/"(AF1Qip[^"]+)",\["https:\/\/lh3/g)];
+  const ids = new Set(matches.map(m => m[1]));
+  return ids.size > 0 ? ids.size : null;
+}
+
 export function makeSearchText(title: string): string {
   return title.toLowerCase().replace(/[–—]/g, '-');
 }
