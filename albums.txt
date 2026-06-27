@@ -1,9 +1,20 @@
-# Dodaj URL-e albumów Google Photos — jeden na linię
-# Linie zaczynające się od "#" są komentarzami i są ignorowane
-# Puste linie są ignorowane
+# Lista albumów Google Photos wyświetlanych w galerii.
+# Linie zaczynające się od "#" są komentarzami i są ignorowane.
+# Puste linie są ignorowane.
 #
-# Format nazwy albumu w Google Photos: YYYY-MM-DD Nazwa albumu
-# Przykład: 2024-08-03 Wolin - Walki
+# FORMAT PODSTAWOWY (nazwa pobierana automatycznie z Google Photos):
+#   https://photos.app.goo.gl/XYZ
+#
+# FORMAT Z WŁASNĄ NAZWĄ (po pionowej kresce "|"):
+#   https://photos.app.goo.gl/XYZ | 2024-08-03 Wolin
+#
+# Własna nazwa przydaje się gdy:
+#   - tytuł albumu w Google Photos jest nieczytelny lub pusty
+#   - chcesz wymusić konkretny format daty (YYYY-MM-DD)
+#   - album ma kilka dni: np. "2024-08-03-05 Wolin" (data = 3 sie, nazwa = Wolin)
+#
+# Data jest wykrywana automatycznie z nazwy (format YYYY-MM-DD, YYYY.MM.DD, YYYY/MM itp.)
+# i służy do sortowania albumów.
 
 https://photos.app.goo.gl/DEly8fzq6MZWSw2a2
 https://photos.app.goo.gl/5JV2tW5nr0Z3bn1G2
