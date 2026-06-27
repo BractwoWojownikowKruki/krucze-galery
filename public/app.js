@@ -77,7 +77,7 @@ function renderCard(album) {
     : `<span class="no-date-badge">bez daty</span>`;
 
   const countBadge = album.photoCount != null
-    ? `<button class="btn-count" aria-label="Informacja o liczbie zdjęć">${ICON_PHOTO}<span>${album.photoCount}</span></button>`
+    ? `<button class="btn-count" aria-label="Informacja o liczbie zdjęć"><span>${album.photoCount >= 300 ? '300+' : album.photoCount}</span>${ICON_PHOTO}</button>`
     : '';
 
   return `

@@ -184,7 +184,7 @@ main { padding: 1.25rem 1.5rem 3rem; }
 
 .title-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 4px;
 }
 
@@ -203,15 +203,14 @@ main { padding: 1.25rem 1.5rem 3rem; }
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  padding: 1px 2px;
+  padding: 0 2px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 3px;
-  margin-top: 1px;
 }
 .btn-count:hover { color: var(--gold); }
-.btn-count svg { width: 11px; height: 11px; pointer-events: none; }
+.btn-count svg { width: 11px; height: 11px; pointer-events: none; flex-shrink: 0; }
 .btn-count span { font-size: 10px; font-variant-numeric: tabular-nums; line-height: 1; }
 
 .btn-copy {
@@ -219,10 +218,9 @@ main { padding: 1.25rem 1.5rem 3rem; }
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  padding: 1px 2px;
+  padding: 0 2px;
   flex-shrink: 0;
   line-height: 0;
-  margin-top: 1px;
 }
 .btn-copy:hover { color: var(--gold); }
 .btn-copy svg { width: 13px; height: 13px; pointer-events: none; }
